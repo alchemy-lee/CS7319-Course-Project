@@ -1,2 +1,6 @@
-# CS7319-Course-Project
-Course Project of CS7319 in SJTU
+
+训练 100 轮时间
+
+原版：3490.6453292369843s
+
+转置版：2636.3908812999725s
