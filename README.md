@@ -4,7 +4,7 @@
 
 Studies on bidirectional neural networks can be traced back to auto-association in the 1980s.
 One typical example was Least Mean Square Error Reconstruction (Lmser) self-organizing
-network that was rst proposed in 1991. Proceeded beyond AE, Lmser is featured
+network that was first proposed in 1991. Proceeded beyond AE, Lmser is featured
 by a bidirectional architecture with several built-in natures, for which readers can refer to
 Table I in Ref. One major nature of Lmser is Duality in Connection Weights (DCW).
 DCW refers to using the symmetric weights in corresponding layers in encoder and decoder
@@ -13,7 +13,7 @@ a symmetrical structure in Lmser is to approximate identity mapping per two cons
 layers simply through $W^TW \approx I$, where $W^TW = I$ holds only if the weight matrix $W$ is
 orthogonal. However, when $W$ is not orthogonal even not a square matrix, what should we
 do to minimize the discrepancy between $x$ and $W^dW^ex$? One way is to constraint $W^d$ to be
-the pseudo inverse of We. You are required to
+the pseudo inverse of $W^e$. You are required to
 
 1. Build a reconstruction network with the constraint that the weight matrix in the decoder
    to be the pseudo inverse of the encoder in the corresponding layers
