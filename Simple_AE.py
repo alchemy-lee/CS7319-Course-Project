@@ -14,23 +14,20 @@ from models.AutoEncoderWithPseudoInverse import AutoEncoderWithPseudoInverse
 def get_MNIST_data():
     # 将像素点转换到[-1, 1]之间，使得输入变成一个比较对称的分布，训练容易收敛
     data_tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
-    # train_dataset = datasets.MNIST(root='./data', train=True, transform=data_tf, download=True)
-    train_dataset = datasets.MNIST(root='./data', transform = transforms.ToTensor(), train=True, download=True)
+    train_dataset = datasets.MNIST(root='./data', train=True, transform=data_tf, download=True)
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, drop_last=True)
     return train_loader
 
 
 def get_FMNIST_data():
-    # 将像素点转换到[-1, 1]之间，使得输入变成一个比较对称的分布，训练容易收敛
-    data_tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
-    train_dataset = datasets.FashionMNIST(root='./data', train=True, transform=data_tf, download=True)
+    train_dataset = datasets.FashionMNIST(root='./data', train=True, transform=transforms.ToTensor(), download=True)
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, drop_last=True)
     return train_loader
 
 
 def to_img(x):
-    # x = (x + 1.) * 0.5
-    # x = x.clamp(0, 1)
+    x = (x + 1.) * 0.5
+    x = x.clamp(0, 1)
     x = x.view(x.size(0), 1, 28, 28)
     return x
 
@@ -44,12 +41,16 @@ weight_decay = 1e-5
 epoches = 100
 model = AutoEncoderWithPseudoInverse()
 
+
+# 文件和模型路径名
+path_name = "lmser-torch-f"
 train_data = get_MNIST_data()
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-# 文件和模型路径名
-path_name = "lmser"
+
 loss_array = []
+print(model)
+
 
 if torch.cuda.is_available():
     model.cuda()
@@ -63,8 +64,6 @@ for epoch in range(epoches):
         # forward
         _, output = model(img)
         loss = criterion(output, img)
-        # print([img[0]])
-        # print(torch.mm(model.decoder[6].weight.data, torch.mm(model.encoder[0].weight.data, img[0:1].t())))
         # backward
         optimizer.zero_grad()
         loss.backward()
@@ -105,5 +104,47 @@ f.close()
 
 
 # In[3]
+batch_size = 6
 
 
+def get_MNIST_test_data():
+    data_tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
+    test_dataset = datasets.MNIST(root='./data', transform=data_tf, train=False, download=True)
+    test_loader = DataLoader(test_dataset, shuffle=False, batch_size=batch_size)
+    return test_loader
+
+
+def get_FMNIST_test_data():
+    test_dataset = datasets.FashionMNIST(root='./data', transform=transforms.ToTensor(), train=False, download=True)
+    test_loader = DataLoader(test_dataset, shuffle=False, batch_size=batch_size)
+    return test_loader
+
+
+path_name = "lmser-torch-f"
+model = torch.load('./models/' + path_name + '.pkl')
+test_data = get_FMNIST_test_data()
+
+dataiter = iter(test_data)
+for i in range(5):
+    img, labels = dataiter.next()
+    original_img = to_img(img)
+    save_image(original_img, './img/' + path_name + '/original_{}.png'.format(i + 1))
+
+    img = img.view(img.size(0), -1)
+    decode_img = model(img)
+    decode_img = to_img(decode_img[1])
+    save_image(decode_img, './img/' + path_name + '/test_{}.png'.format(i + 1))
+
+criterion = nn.MSELoss()
+loss_sum = 0
+i = 0
+for img, _ in train_data:
+    img = img.view(img.size(0), -1)
+    # img = Variable(img.cuda())
+    # forward
+    _, output = model(img)
+    loss = criterion(output, img)
+    loss_sum += loss.data
+    i += 1
+
+print(loss_sum / i)

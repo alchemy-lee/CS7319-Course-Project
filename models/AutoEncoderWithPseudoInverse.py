@@ -32,9 +32,9 @@ class AutoEncoderWithPseudoInverse(nn.Module):
 
     def forward(self, x):
         encoded = self.encoder(x)
-        self.decoder[6].weight.data = get_pseudo_inverse(self.encoder[0].weight.data)
-        self.decoder[4].weight.data = get_pseudo_inverse(self.encoder[2].weight.data)
-        self.decoder[2].weight.data = get_pseudo_inverse(self.encoder[4].weight.data)
-        self.decoder[0].weight.data = get_pseudo_inverse(self.encoder[6].weight.data)
+        self.decoder[6].weight.data = torch.pinverse(self.encoder[0].weight.data)
+        self.decoder[4].weight.data = torch.pinverse(self.encoder[2].weight.data)
+        self.decoder[2].weight.data = torch.pinverse(self.encoder[4].weight.data)
+        self.decoder[0].weight.data = torch.pinverse(self.encoder[6].weight.data)
         decoded = self.decoder(encoded)
         return encoded, decoded

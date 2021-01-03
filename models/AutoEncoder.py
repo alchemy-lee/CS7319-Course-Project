@@ -22,9 +22,9 @@ class AutoEncoder(nn.Module):
 
     def forward(self, x):
         encoded = self.encoder(x)
-        # self.decoder[6].weight.data = self.encoder[0].weight.data.transpose(0, 1)
-        # self.decoder[4].weight.data = self.encoder[2].weight.data.transpose(0, 1)
-        # self.decoder[2].weight.data = self.encoder[4].weight.data.transpose(0, 1)
-        # self.decoder[0].weight.data = self.encoder[6].weight.data.transpose(0, 1)
+        self.decoder[6].weight.data = self.encoder[0].weight.data.transpose(0, 1)
+        self.decoder[4].weight.data = self.encoder[2].weight.data.transpose(0, 1)
+        self.decoder[2].weight.data = self.encoder[4].weight.data.transpose(0, 1)
+        self.decoder[0].weight.data = self.encoder[6].weight.data.transpose(0, 1)
         decoded = self.decoder(encoded)
         return encoded, decoded
